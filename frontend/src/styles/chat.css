@@ -1,0 +1,346 @@
+/* Student Loan Assistant chat UI (plain CSS) */
+
+/* ---------------------------------------------------------------
+   Two-panel layout
+   Left/main: student loan records from GET /api/students
+   Right: the existing Student Loan Assistant chatbot
+   --------------------------------------------------------------- */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden; /* each panel scrolls on its own */
+}
+
+/* Left panel (approx. 65-70% on desktop) */
+.data-panel {
+  flex: 0 0 67%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+.data-panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #1f6feb;
+  color: #fff;
+}
+.data-panel-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+.data-panel-count {
+  font-size: 12px;
+  opacity: 0.85;
+}
+.data-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto; /* the records table scrolls inside the panel */
+  padding: 20px;
+  background: #f5f7fb;
+}
+.data-panel-status {
+  margin: 0;
+  color: #57606a;
+  font-size: 14px;
+}
+.data-panel-error {
+  color: #a40e26;
+}
+
+/* Right panel (approx. 30-35% on desktop) */
+.chat-app {
+  flex: 1 1 33%;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f5f7fb;
+  border-left: 1px solid #e3e8f0; /* vertical divider between the panels */
+}
+
+/* Desktop: two columns. Smaller screens: stack the database above the chatbot. */
+@media (max-width: 1024px) {
+  .app-shell {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+  .data-panel {
+    flex: none;
+    width: 100%;
+  }
+  .data-panel-body {
+    max-height: 50vh;
+  }
+  .chat-app {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 60vh;
+    border-left: none;
+    border-top: 1px solid #e3e8f0;
+  }
+  .chat-messages {
+    max-height: 60vh;
+  }
+}
+
+/* Header */
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  background: #1f6feb;
+  color: #fff;
+}
+.chat-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+.chat-header-logo {
+  font-size: 20px;
+}
+.chat-header h1 {
+  flex: 1 1 auto;
+}
+.chat-new-button {
+  flex: none;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chat-new-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Messages */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.message {
+  display: flex;
+}
+.message-user {
+  justify-content: flex-end;
+}
+.message-ai {
+  justify-content: flex-start;
+}
+/* Wraps an AI bubble together with the optional result table below it. */
+.message-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 80%;
+  min-width: 0;
+}
+.bubble {
+  max-width: 100%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.bubble-user {
+  background: #1f6feb;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.bubble-ai {
+  background: #fff;
+  color: #24292f;
+  border: 1px solid #e3e8f0;
+  border-bottom-left-radius: 4px;
+}
+.typing {
+  color: #57606a;
+  font-style: italic;
+}
+
+/* Error */
+.chat-error {
+  margin: 0 20px 10px;
+  padding: 10px 14px;
+  background: #ffebe9;
+  border: 1px solid #ff8182;
+  border-radius: 8px;
+  color: #a40e26;
+  font-size: 13px;
+}
+
+/* Result chart (optional SVG visualisation above the result table) */
+.result-chart {
+  align-self: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 10px 4px;
+  border: 1px solid #e3e8f0;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.result-chart-title {
+  margin: 0 2px 6px;
+  color: #24292f;
+  font-size: 13px;
+  font-weight: 600;
+}
+.chart-svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+}
+/* Measured by the chart components to adapt tick density to the narrow panel. */
+.chart-svg-wrap {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+/* Compact pie legend below the chart: wraps instead of overlapping. */
+.chart-legend {
+  list-style: none;
+  margin: 8px 2px 4px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.chart-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 12px;
+  color: #24292f;
+}
+.chart-legend-swatch {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.chart-legend-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.chart-legend-value {
+  flex: none;
+  color: #57606a;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Result table (columns/rows are generated dynamically from the API response) */
+.result-table-wrap {
+  align-self: flex-start;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e3e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: #24292f;
+}
+.result-table th,
+.result-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eef1f6;
+  vertical-align: top;
+  white-space: nowrap;
+}
+.result-table th {
+  background: #f1f5fb;
+  color: #1f6feb;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: lowercase;
+}
+.result-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.result-table tbody tr:nth-child(even) {
+  background: #fafbfe;
+}
+.result-table .result-empty {
+  color: #57606a;
+  font-style: italic;
+}
+.result-note {
+  margin: 0;
+  padding: 6px 12px;
+  border-top: 1px solid #eef1f6;
+  background: #fafbfe;
+  color: #57606a;
+  font-size: 12px;
+}
+
+/* Input */
+.chat-input {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px;
+  background: #fff;
+  border-top: 1px solid #e3e8f0;
+}
+.chat-input input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.chat-input input:focus {
+  border-color: #1f6feb;
+}
+.chat-input input:disabled {
+  background: #f5f7fb;
+}
+.chat-input button {
+  padding: 0 22px;
+  border: none;
+  border-radius: 8px;
+  background: #1f6feb;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chat-input button:hover:not(:disabled) {
+  background: #1857c2;
+}
+.chat-input button:disabled {
+  background: #9fbef0;
+  cursor: not-allowed;
+}
